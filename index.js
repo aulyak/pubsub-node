@@ -21,10 +21,8 @@ const CONTAINER = {
 };
 
 (async () => {
-  const messagePromises = [
-    pubSub.listenForMessages(config.message_subscriber_id, CONTAINER),
-    pubSub.listenForMessages(config.key_subscriber_id, CONTAINER),
-  ];
+  console.log('start listening...');
 
-  await Promise.all(messagePromises);
+  pubSub.listenForMessages(config.message_subscriber_id, CONTAINER);
+  pubSub.listenForMessages(config.key_subscriber_id, CONTAINER);
 })();

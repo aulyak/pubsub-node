@@ -1,12 +1,15 @@
 const {PubSub} = require('@google-cloud/pubsub');
 const config = require('./config.json');
 const axios = require('axios');
+const FormData = require('form-data');
+const fs = require('fs');
 
 // Creates a client; cache this for further use
 const pubSubClient = new PubSub();
 
 let keyId = 0;
 let messageId = 0;
+let lastNum = 0;
 
 const pubSub = {
   listenForMessages: async (subscriptionNameOrId, CONTAINER) => {
@@ -15,8 +18,7 @@ const pubSub = {
 
     // Create an event handler to handle messages
     const messageHandler = async message => {
-      messageCount += 1;
-
+      console.log('receiving data...');
       // "Ack" (acknowledge receipt of) the message
       message.ack();
       const jsonMessage = JSON.parse(`${message.data}`);
@@ -36,7 +38,9 @@ const pubSub = {
         const decryptedMessage = await pubSub.decryptMessage(CONTAINER.key, CONTAINER.message);
         const result = decryptedMessage.data.result;
 
-        pubSub.postToKintone(result);
+        const fileKey = await pubSub.uploadFile();
+        pubSub.postToKintone(result, fileKey);
+        console.log('finished...');
       }
     };
 
@@ -57,7 +61,8 @@ const pubSub = {
       headers
     );
   },
-  postToKintone: async (quote) => {
+  postToKintone: async (quote, fileKey) => {
+    console.log('posting data...');
     const {content, author} = {...quote};
 
     const headers = {
@@ -73,11 +78,39 @@ const pubSub = {
         app: config.kintone_app_id,
         record: {
           quote: {value: content},
-          author: {value: author}
+          author: {value: author},
+          picture: {value: [{fileKey}]}
         }
       },
       headers
     );
+  },
+  uploadFile: async () => {
+    const form = new FormData();
+    let currentImageNumber = Math.floor(Math.random() * 30) + 1
+
+    while (lastNum === currentImageNumber) {
+      currentImageNumber = Math.floor(Math.random() * 30) + 1
+    }
+
+    lastNum = currentImageNumber;
+
+    form.append('file', fs.readFileSync(`./spongebob/${currentImageNumber}.png`), `./spongebob/${currentImageNumber}.png`);
+    
+    const response = await axios.post(
+        config.kintone_upload_file_url,
+        form,
+        {
+            headers: {
+                ...form.getHeaders(),
+                "X-Cybozu-Authorization": config.user_token,
+                "Content-Type": "multipart/form-data",
+                "Accept-Encoding": null
+            }
+        }
+    );
+
+    return response.data.fileKey;
   }
 };
 
