@@ -1,0 +1,11 @@
+{
+  "topic_message": "ebkap-kintone-message",
+  "topic_key": "ankru-kintone-key",
+  "message_subscriber_id": "ebkap-kintone-message-subscription",
+  "key_subscriber_id": "ankru-kintone-key-subscription",
+  "bearer_token": "10|BndgFZgmm489q9r110pRmtUzqbAVoFsbUwLxdn5S",
+  "decrypt_url": "https://challenges.aqi.co.id/api/microservices/decrypt/",
+  "kintone_add_record_url": "https://aqi-demo.cybozu.com/k/v1/record.json",
+  "kintone_app_id": 1783,
+  "user_token": "YXVseWEua2hhdHVsaXN0aXZhbmlAYXFpLmNvLmlkOmtpbnRvbmU0dWx5QTE="
+}
