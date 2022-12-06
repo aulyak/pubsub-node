@@ -87,27 +87,27 @@ const pubSub = {
   },
   uploadFile: async () => {
     const form = new FormData();
-    let currentImageNumber = Math.floor(Math.random() * 30) + 1
+    let currentImageNumber = Math.floor(Math.random() * 15) + 1;
 
     while (lastNum === currentImageNumber) {
-      currentImageNumber = Math.floor(Math.random() * 30) + 1
+      currentImageNumber = Math.floor(Math.random() * 15) + 1;
     }
 
     lastNum = currentImageNumber;
 
-    form.append('file', fs.readFileSync(`./spongebob/${currentImageNumber}.png`), `./spongebob/${currentImageNumber}.png`);
-    
+    form.append('file', fs.readFileSync(`./game_characters/${currentImageNumber}.png`), `./game_characters/${currentImageNumber}.png`);
+
     const response = await axios.post(
-        config.kintone_upload_file_url,
-        form,
-        {
-            headers: {
-                ...form.getHeaders(),
-                "X-Cybozu-Authorization": config.user_token,
-                "Content-Type": "multipart/form-data",
-                "Accept-Encoding": null
-            }
+      config.kintone_upload_file_url,
+      form,
+      {
+        headers: {
+          ...form.getHeaders(),
+          "X-Cybozu-Authorization": config.user_token,
+          "Content-Type": "multipart/form-data",
+          "Accept-Encoding": null
         }
+      }
     );
 
     return response.data.fileKey;
